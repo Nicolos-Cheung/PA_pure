@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+	http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+	<display-name></display-name>
+
+
+	<servlet>
+		<servlet-name>PCMRegisterServlet</servlet-name>
+		<servlet-class>com.pingan.servlet.pcm.PCMRegisterServlet</servlet-class>
+		<async-supported>true</async-supported>
+	</servlet>
+	<servlet>
+		<servlet-name>PCMUpdateServlet</servlet-name>
+		<servlet-class>com.pingan.servlet.pcm.PCMUpdateServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>PCMValidationServlet</servlet-name>
+		<servlet-class>com.pingan.servlet.pcm.PCMValidationServlet</servlet-class>
+		<async-supported>true</async-supported>
+	</servlet>
+	<servlet>
+		<servlet-name>PCMDeleteServlet</servlet-name>
+		<servlet-class>com.pingan.servlet.pcm.PCMDeleteServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>PCMQueryServlet</servlet-name>
+		<servlet-class>com.pingan.servlet.pcm.PCMQueryServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>TestServlet</servlet-name>
+		<servlet-class>com.pingan.servlet.pcm.TestServlet</servlet-class>
+	</servlet>
+
+
+
+
+
+
+	<servlet-mapping>
+		<servlet-name>PCMRegisterServlet</servlet-name>
+		<url-pattern>/pcm_register</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>PCMUpdateServlet</servlet-name>
+		<url-pattern>/pcm_update</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>PCMValidationServlet</servlet-name>
+		<url-pattern>/pcm_validation</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>PCMDeleteServlet</servlet-name>
+		<url-pattern>/pcm_delete</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>PCMQueryServlet</servlet-name>
+		<url-pattern>/pcm_query</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>TestServlet</servlet-name>
+		<url-pattern>/test</url-pattern>
+	</servlet-mapping>
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+</web-app>
