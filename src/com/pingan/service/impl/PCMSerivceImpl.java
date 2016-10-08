@@ -91,7 +91,7 @@ public class PCMSerivceImpl implements PCMSerivce {
 	public boolean isAvailable(String person_id) {
 
 		PCMRequestBean query = dao.Query(person_id);
-
+		
 		if (query != null && query.getAvailable() != null
 				&& query.getAvailable().equals("1")) {
 
@@ -109,6 +109,11 @@ public class PCMSerivceImpl implements PCMSerivce {
 
 		String user_root_path = dao.Query(person_id).getUser_root_path();
 		return user_root_path;
+	}
+
+	@Override
+	public void remove(String person_id) {
+		dao.remove(person_id);
 	}
 
 }

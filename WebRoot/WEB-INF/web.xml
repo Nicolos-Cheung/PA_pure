@@ -25,6 +25,10 @@
 		<servlet-class>com.pingan.servlet.pcm.PCMDeleteServlet</servlet-class>
 	</servlet>
 	<servlet>
+		<servlet-name>PCMCancelServlet</servlet-name>
+		<servlet-class>com.pingan.servlet.pcm.PCMCancelServlet</servlet-class>
+	</servlet>
+	<servlet>
 		<servlet-name>PCMQueryServlet</servlet-name>
 		<servlet-class>com.pingan.servlet.pcm.PCMQueryServlet</servlet-class>
 	</servlet>
@@ -51,8 +55,9 @@
 		<url-pattern>/pcm_validation</url-pattern>
 	</servlet-mapping>
 
+
 	<servlet-mapping>
-		<servlet-name>PCMDeleteServlet</servlet-name>
+		<servlet-name>PCMCancelServlet</servlet-name>
 		<url-pattern>/pcm_delete</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>

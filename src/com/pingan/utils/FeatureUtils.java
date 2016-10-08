@@ -79,6 +79,7 @@ public class FeatureUtils {
 
 	/**
 	 * 
+	 * 点积评分方式
 	 * @param registerdir
 	 *            注册特征值文件路径
 	 * @param testdir
@@ -115,7 +116,7 @@ public class FeatureUtils {
 	}
 
 	/**
-	 * 
+	 * PLDA评分方式
 	 * @param registerdir
 	 *            注册特征值文件路径
 	 * @param testdir

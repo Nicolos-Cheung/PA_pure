@@ -8,6 +8,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.Mongo;
+import com.mongodb.WriteResult;
 import com.pingan.constant.Constant;
 import com.pingan.dao.PCMdao;
 import com.pingan.domain.PCMRequestBean;
@@ -39,7 +40,7 @@ public class PCMdaoImpl implements PCMdao {
 			dbObject.put("ivector_path", pcb.getIvector_path());
 			dbObject.put("available", pcb.getAvailable());
 			dbObject.put("user_root_path", pcb.getUser_root_path());
-			collection.insert(dbObject);
+			WriteResult insert = collection.insert(dbObject);
 			return true;
 
 		} catch (UnknownHostException e) {
@@ -69,6 +70,7 @@ public class PCMdaoImpl implements PCMdao {
 			pcb = new PCMRequestBean();
 			while (dbCursor.hasNext()) {
 				DBObject ob = dbCursor.next();
+
 				if (ob.get("user_id") != null) {
 					pcb.setUser_id(ob.get("user_id").toString().trim());
 				}
@@ -114,7 +116,6 @@ public class PCMdaoImpl implements PCMdao {
 					pcb.setUser_root_path(ob.get("user_root_path").toString()
 							.trim());
 				}
-
 			}
 			return pcb;
 
@@ -135,7 +136,7 @@ public class PCMdaoImpl implements PCMdao {
 			mongo = new Mongo(mongodb_ip, mongodb_port);
 			DB db = mongo.getDB(DB_name);
 			DBObject queryObject = new BasicDBObject();
-			queryObject.put("person_id", pcb.getUser_id());
+			queryObject.put("person_id", pcb.getPerson_id());
 			DBCollection collection = db.getCollection(Collection_name);
 			DBObject dbObject = new BasicDBObject();
 			if (isNotNull(pcb.getUser_id())) {
@@ -172,8 +173,13 @@ public class PCMdaoImpl implements PCMdao {
 			if (isNotNull(pcb.getAvailable())) {
 				dbObject.put("available", pcb.getAvailable());
 			}
+			if (isNotNull(pcb.getUser_root_path())) {
+				dbObject.put("user_root_path", pcb.getUser_root_path());
+			}
 
-			collection.update(queryObject, dbObject);
+			WriteResult update = collection.update(queryObject, dbObject);
+			String error = update.getError();
+			System.out.println(error);
 
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
@@ -185,7 +191,7 @@ public class PCMdaoImpl implements PCMdao {
 	}
 
 	@Override
-	public void remoove(String person_id) {
+	public void remove(String person_id) {
 		Mongo mongo = null;
 		try {
 			mongo = new Mongo(mongodb_ip, mongodb_port);

@@ -40,12 +40,13 @@ public interface Constant {
 	 */
 	public static final String FILEPATH = "/home/pingandl/javaserver/server_data";
 	
-
-	/**
-	 * 上传注册语音文件的目录
-	 */
-	public static final String VOICEPATH = FILEPATH + "/voice";
-
+//----------------------------------------------------------------------------------------------------
+	
+	
+	
+	
+	
+	
 	/**
 	 * PCM上传注册语音文件,和ivector的根目录
 	 */
@@ -57,39 +58,13 @@ public interface Constant {
 	public static final String PCMTESTROOT = FILEPATH + "/pcm_testdataroot";
 	
 	
-	/**
-	 * 是否保存PCM数据
-	 */
-	public static final boolean IS_RETAIN_PCM_DATA = true;
-
-	/**
-	 * 上传验证语音文件的目录
-	 */
-	public static final String VALIDATION_VOICEPATH = FILEPATH + "/voice";
-
-	/**
-	 * 是否保留验证音频
-	 */
-	public static final boolean IS_RETAIN_VALIDATION_VOICE = false;
 
 	/**
 	 * UpLoad临时文件目录
 	 */
 	public static final String TEMPPATH = FILEPATH + "/temp";
 
-	/**
-	 * 注册特征文件的目录
-	 */
-	public static final String IVECTOR_PATH = FILEPATH + "/ivector";
 
-	/**
-	 * 使用的数据库类型：
-	 */
-	public static final DB WHICH_DATABASE = DB.MYSQL;
-
-	public enum DB {
-		MYSQL, MONGODB
-	}
 
 	/**
 	 * MongoDB IP

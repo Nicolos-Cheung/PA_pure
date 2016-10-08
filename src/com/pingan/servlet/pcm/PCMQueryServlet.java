@@ -15,7 +15,7 @@ import com.pingan.service.impl.PCMSerivceImpl;
 public class PCMQueryServlet extends HttpServlet {
 
 	private static final long serialVersionUID = -6751736837368642046L;
-	private PCMSerivce service;
+	private PCMSerivceImpl service;
 
 	@Override
 	public void init() throws ServletException {
@@ -35,20 +35,27 @@ public class PCMQueryServlet extends HttpServlet {
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
+		System.out.println("----------------Query...----------------");
+
 		int statues_code = 0;
 
 		String person_id = request.getParameter("person_id");
+		System.out.println("Person_id=" + person_id);
+
 		String response_num = request.getParameter("response_num");
 
 		if (!service.isAvailable(person_id)) {
 			statues_code = 1;
 		}
 
-		JSONObject jo = new JSONObject();
-		jo.put("response_num", response_num);
-		jo.put("statues_code", statues_code);
+		JSONObject json = new JSONObject();
+		json.put("response_num", response_num);
+		json.put("statues_code", statues_code);
 
-		response.getWriter().write(jo.toString());
+		response.getWriter().write(json.toString());
+
+		System.out.println("json==>" + json.toString());
+		System.out.println("----------------Query Complete!----------------");
 
 	}
 

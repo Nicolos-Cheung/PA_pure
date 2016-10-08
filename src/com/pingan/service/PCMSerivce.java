@@ -45,5 +45,7 @@ public interface PCMSerivce {
 
 	
 	String getRegisterRootPath(String person_id);
+	
+	void remove(String person_id);
 
 }

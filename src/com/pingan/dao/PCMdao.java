@@ -10,6 +10,6 @@ public interface PCMdao {
 	
 	void update(PCMRequestBean pcb);
 	
-	void remoove(String person_id);
+	void remove(String person_id);
 	
 }

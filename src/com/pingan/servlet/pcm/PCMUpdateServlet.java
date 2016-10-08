@@ -56,18 +56,17 @@ public class PCMUpdateServlet extends HttpServlet {
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		System.out.println("----------------Update...----------------");
 
 		PCMRequestBean updatepcb = new PCMRequestBean();
 		String userfilepath = "";
 		File pcmfile = null;
-		int statues_code = 0; // 0成功注册，1上传文件失败
+		int statues_code = 0;
 		boolean hasFile = false;
-
-		System.out.println("PCMRegisterServlet Run!");
-
 		response.setContentType("text/plain");
 		// 向客户端发送响应正文
 		PrintWriter outNet = response.getWriter();
+		String response_num = "";
 
 		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
 
@@ -85,7 +84,6 @@ public class PCMUpdateServlet extends HttpServlet {
 			try {
 
 				List<FileItem> items = upload.parseRequest(request);
-
 				for (FileItem item : items) {
 					if (item.isFormField()) {
 
@@ -95,7 +93,7 @@ public class PCMUpdateServlet extends HttpServlet {
 							updatepcb.setUser_id(item.getString());
 						}
 						if (name.equals("person_id")) {
-							updatepcb.setPerson_id(item.getString());
+							updatepcb.setPerson_id(item.getString().trim());
 						}
 						if (name.equals("telnum")) {
 							updatepcb.setTelnum(item.getString());
@@ -109,12 +107,15 @@ public class PCMUpdateServlet extends HttpServlet {
 						if (name.equals("nas_dir")) {
 							updatepcb.setNas_dir(item.getString());
 						}
+						if (name.equals("response_num")) {
+							response_num = item.getString();
+						}
 
 						updatepcb.setRegister_date(PublicUtils.getDetailData());
 
 					} else {
 
-						System.out.println("person_id"
+						System.out.println("update_person_id"
 								+ updatepcb.getPerson_id());
 
 						if (null == updatepcb.getPerson_id()
@@ -130,7 +131,6 @@ public class PCMUpdateServlet extends HttpServlet {
 									.getRegisterRootPath(updatepcb
 											.getPerson_id());
 							updatepcb.setUser_root_path(userfilepath);
-							System.out.println("userfilepath=" + userfilepath);
 							pcmfile = processUploadedFile(item,
 									updatepcb.getPerson_id(), userfilepath,
 									"pcm"); // 处理上传文件
@@ -158,8 +158,8 @@ public class PCMUpdateServlet extends HttpServlet {
 				List<String> featureList = FeatureUtils.KaldiToPcmIvecter(
 						pcmfile.getAbsolutePath(), Constant.PCMTOOLPATH);
 
-				if (null == featureList && featureList.size() == 0) {
-					statues_code += 2; 
+				if (null == featureList || featureList.size() == 0) {
+					statues_code += 2;
 				} else if (statues_code == 0) {
 
 					String ivectorPath = FeatureUtils
@@ -173,9 +173,11 @@ public class PCMUpdateServlet extends HttpServlet {
 					updatepcb.setAvailable("1");
 					updatepcb.setIvector_path(ivectorPath);
 					updatepcb.setIvector_version(Constant.IVECTOR_VERSION);
+					updatepcb.setRegister_date(PublicUtils.getDetailData());
 
 					if (updatepcb.isAbleToRegister()) {
 						service.update(updatepcb);
+						System.out.println("UpdatePCB:==>" + updatepcb.toString());
 					} else {
 						statues_code += 8;
 					}
@@ -186,16 +188,18 @@ public class PCMUpdateServlet extends HttpServlet {
 		}
 
 		JSONObject json = new JSONObject();
-		json.put("response_num", updatepcb.getResponse_num());
+		json.put("response_num", response_num);
 		json.put("statues_code", statues_code); // 1上传失败 2ivector计算出错 4用户已注册
 
-		System.out.println("UpdatePCB:=====>" + updatepcb.toString());
-		System.out.println("json:=====>" + json.toString());
+		
+		System.out.println("Json:==>" + json.toString());
 
 		outNet.print(json.toString());
 		if (outNet != null) {
 			outNet.close();
 		}
+		
+		System.out.println("----------------Update complete!----------------");
 
 	}
 
@@ -216,7 +220,7 @@ public class PCMUpdateServlet extends HttpServlet {
 		try {
 			long fileSize = item.getSize();
 
-			if (filename.equals("") && fileSize == 0) {
+			if (filename.equals("") || fileSize == 0) {
 				System.out.println("File upload failed!");
 				return null;
 			}
@@ -232,7 +236,6 @@ public class PCMUpdateServlet extends HttpServlet {
 			File uploadedFile = new File(uploadpath, PublicUtils.getFileName(
 					"update_register", user_id, filetype));
 			item.write(uploadedFile);
-			System.out.println("PCM_path" + uploadedFile.getAbsolutePath());
 
 			return uploadedFile;
 

@@ -59,15 +59,18 @@ public class PCMRegisterServlet extends HttpServlet {
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
+		System.out.println("----------------Register...----------------");
+
 		PCMRequestBean pcb = new PCMRequestBean();
 		String userfilepath = "";
 		int statues_code = 0; // 0成功注册，1上传文件失败
 
-		System.out.println("PCMRegisterServlet Run!");
-
 		response.setContentType("text/plain");
+
 		// 向客户端发送响应正文
 		PrintWriter outNet = response.getWriter();
+
+		String response_num = null;
 
 		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
 
@@ -110,6 +113,10 @@ public class PCMRegisterServlet extends HttpServlet {
 							pcb.setNas_dir(item.getString());
 						}
 
+						if (name.equals("response_num")) {
+							response_num = item.getString();
+						}
+
 						pcb.setRegister_date(PublicUtils.getDetailData());
 
 					} else {
@@ -133,7 +140,6 @@ public class PCMRegisterServlet extends HttpServlet {
 							if (pcmfile == null) {
 								statues_code += 1;
 							} else {
-								System.out.println(pcmfile.getAbsolutePath());
 								pcb.setRegister_voice_path(pcmfile
 										.getAbsolutePath());
 							}
@@ -148,13 +154,11 @@ public class PCMRegisterServlet extends HttpServlet {
 
 		// 进行注册
 
-		System.out.println("register...." + statues_code);
-
 		if (statues_code <= 0) {
 			List<String> ivectorList = FeatureUtils.KaldiToPcmIvecter(
 					pcb.getRegister_voice_path(), Constant.PCMTOOLPATH);
 
-			if (null == ivectorList && ivectorList.size() == 0) {
+			if (null == ivectorList || ivectorList.size() == 0) {
 				statues_code += 2; // ivector计算出错
 			} else if (statues_code == 0) {
 				String ivectorPath = FeatureUtils.ListToFile_Return_FilePath2(
@@ -170,6 +174,7 @@ public class PCMRegisterServlet extends HttpServlet {
 					if (!service.register(pcb)) {
 						statues_code += 16;
 					}
+					System.out.println("RegisterPCB:==>" + pcb.toString());
 				} else {
 					statues_code += 8;
 				}
@@ -178,12 +183,15 @@ public class PCMRegisterServlet extends HttpServlet {
 		}
 
 		JSONObject json = new JSONObject();
-		json.put("response_num", pcb.getResponse_num());
+		json.put("response_num", response_num);
 		json.put("statues_code", statues_code); // 1上传失败 2ivector计算出错 4用户已注册
 		outNet.print(json.toString());
 		if (outNet != null) {
 			outNet.close();
 		}
+		System.out.println("Json==>" + json.toString());
+
+		System.out.println("----------------Register Complete!----------------");
 
 	}
 
@@ -220,8 +228,6 @@ public class PCMRegisterServlet extends HttpServlet {
 			File uploadedFile = new File(uploadpath, PublicUtils.getFileName(
 					"register", user_id, filetype));
 			item.write(uploadedFile);
-			System.out.println("PCM_path" + uploadedFile.getAbsolutePath());
-
 			return uploadedFile;
 
 		} catch (Exception e) {

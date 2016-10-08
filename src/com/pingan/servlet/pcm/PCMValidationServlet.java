@@ -51,13 +51,13 @@ public class PCMValidationServlet extends HttpServlet {
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
+		System.out.println("----------------Validation...----------------");
+
 		int statues_code = 0;
 
 		PCMRequestBean pcb = null;
 		File testvoice = null;
 		String usertestpath = "";
-
-		System.out.println("----------PCMValidationServlet run!--------");
 
 		response.setContentType("text/plain");
 		// 向客户端发送响应正文
@@ -92,21 +92,17 @@ public class PCMValidationServlet extends HttpServlet {
 							response_num = item.getString();
 						}
 					} else {
-						System.out.println(person_id);
+						System.out.println("Validation_person_id=" + person_id);
 
 						if (person_id == null || "".equals(person_id)) {
 
-							
 						} else {
 							pcb = service.Query(person_id);
-							System.out.println("register_pcb" + pcb.toString());
 						}
 
 						if (pcb != null && pcb.isAbleToVali()) {
 							// 文件
 							if (item.getFieldName().equals("file")) {
-
-								System.out.println(pcb.getPerson_id());
 
 								usertestpath = PublicUtils
 										.getConstantUserFilePath(
@@ -123,7 +119,6 @@ public class PCMValidationServlet extends HttpServlet {
 
 							}
 						} else {
-
 							statues_code += 4; // 该注册用户不符合验证条件
 						}
 					}
@@ -137,11 +132,10 @@ public class PCMValidationServlet extends HttpServlet {
 
 		int result = -999;
 		if (statues_code <= 0) {
-			
+
 			List<String> featureList = FeatureUtils.KaldiToPcmIvecter(
 					testvoice.getAbsolutePath(), Constant.PCMTOOLPATH);
 
-			System.out.println("------------------");
 			if (featureList != null && featureList.size() > 0) {
 
 				// 特征文件写入本地
@@ -161,7 +155,7 @@ public class PCMValidationServlet extends HttpServlet {
 				} else {
 					result = 1;
 				}
-				System.out.println(pcb.getPerson_id() + ":" + score);
+				System.out.println("score==>" + score);
 
 			} else {
 				statues_code += 2;
@@ -174,6 +168,11 @@ public class PCMValidationServlet extends HttpServlet {
 		jo.put("result", result);
 		outNet.println(jo.toString());
 		outNet.close();
+
+		System.out.println("Json==>" + jo.toString());
+
+		System.out
+				.println("----------------Validation Complete!----------------");
 	}
 
 	/**
@@ -208,7 +207,6 @@ public class PCMValidationServlet extends HttpServlet {
 			File uploadedFile = new File(uploadpath,
 					PublicUtils.getFileNameWithUUID("test", user_id, filetype));
 			item.write(uploadedFile);
-			System.out.println("PCM_path=" + uploadedFile.getAbsolutePath());
 
 			return uploadedFile;
 
