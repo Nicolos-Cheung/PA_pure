@@ -12,18 +12,9 @@ import net.sf.json.JSONObject;
 import com.pingan.service.PCMSerivce;
 import com.pingan.service.impl.PCMSerivceImpl;
 
-public class PCMQueryServlet extends HttpServlet {
+public class PCMQueryServlet extends BaseUploadServlet {
 
 	private static final long serialVersionUID = -6751736837368642046L;
-	private PCMSerivceImpl service;
-
-	@Override
-	public void init() throws ServletException {
-
-		super.init();
-		service = new PCMSerivceImpl();
-
-	}
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -48,13 +39,8 @@ public class PCMQueryServlet extends HttpServlet {
 			statues_code = 1;
 		}
 
-		JSONObject json = new JSONObject();
-		json.put("response_num", response_num);
-		json.put("statues_code", statues_code);
-
-		response.getWriter().write(json.toString());
-
-		System.out.println("json==>" + json.toString());
+		responsebyJson(response_num, statues_code, response.getWriter());
+		
 		System.out.println("----------------Query Complete!----------------");
 
 	}

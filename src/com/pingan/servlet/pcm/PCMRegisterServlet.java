@@ -21,6 +21,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 import com.pingan.constant.Constant;
 import com.pingan.domain.PCMRequestBean;
+import com.pingan.factory.UploadFactory;
 import com.pingan.service.PCMSerivce;
 import com.pingan.service.impl.PCMSerivceImpl;
 import com.pingan.utils.FeatureUtils;
@@ -31,25 +32,9 @@ import com.pingan.utils.PublicUtils;
  * 
  * @author ning
  */
-public class PCMRegisterServlet extends HttpServlet {
+public class PCMRegisterServlet extends BaseUploadServlet {
 
 	private static final long serialVersionUID = 1L;
-	private PCMSerivceImpl service;
-	private File tempFile;
-
-	public void init(ServletConfig config) throws ServletException {
-		super.init(config);
-
-		initDir();
-		service = new PCMSerivceImpl();
-		tempFile = new File(Constant.TEMPPATH);
-	}
-
-	private void initDir() {
-		PublicUtils.mkDir(Constant.PCMROOT);
-		PublicUtils.mkDir(Constant.TEMPPATH);
-		PublicUtils.mkDir(Constant.PCMTESTROOT);
-	}
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -61,15 +46,13 @@ public class PCMRegisterServlet extends HttpServlet {
 
 		System.out.println("----------------Register...----------------");
 
-		PCMRequestBean pcb = new PCMRequestBean();
-		String userfilepath = "";
-		int statues_code = 0; // 0成功注册，1上传文件失败
-
 		response.setContentType("text/plain");
-
 		// 向客户端发送响应正文
 		PrintWriter outNet = response.getWriter();
 
+		PCMRequestBean pcb = new PCMRequestBean();
+		int statues_code = 0; // 0成功注册，1上传文件失败
+		String userfilepath = "";
 		String response_num = null;
 		boolean isCancel = false; // 用户曾经已注册并注销
 
@@ -77,19 +60,14 @@ public class PCMRegisterServlet extends HttpServlet {
 
 		if (isMultipart) {
 
-			DiskFileItemFactory factory = new DiskFileItemFactory();
-			factory.setSizeThreshold(16 * 1024); // 设置缓冲区大小为16K
-			factory.setRepository(tempFile); // 设置临时目录
-
-			// 创建一个文件上传处理器
-			ServletFileUpload upload = new ServletFileUpload(factory);
-			upload.setHeaderEncoding("utf-8");
-			upload.setSizeMax(20 * 1024 * 1024); // 允许文件的最大上传尺寸10M
+			ServletFileUpload upload = UploadFactory.getBaseUpLoad(tempFile,
+					20 * 1024 * 1024);
 
 			try {
 
 				List<FileItem> items = upload.parseRequest(request);
 
+				
 				for (FileItem item : items) {
 					if (item.isFormField()) {
 
@@ -143,8 +121,11 @@ public class PCMRegisterServlet extends HttpServlet {
 
 							PublicUtils.mkDir(userfilepath);
 
-							File pcmfile = processUploadedFile(item,
-									pcb.getPerson_id(), userfilepath, "pcm"); // 处理上传文件
+							String filename = PublicUtils.getFileName(
+									"register", pcb.getPerson_id(), "pcm");
+
+							File pcmfile = PublicUtils.processUploadedFile(item, filename,
+									userfilepath, "pcm"); // 处理上传文件
 
 							if (pcmfile == null) {
 								statues_code += 1;
@@ -202,60 +183,12 @@ public class PCMRegisterServlet extends HttpServlet {
 			}
 		}
 
-		JSONObject json = new JSONObject();
-		json.put("response_num", response_num);
-		json.put("statues_code", statues_code); // 1上传失败 2ivector计算出错 4用户已注册
-		outNet.print(json.toString());
-		if (outNet != null) {
-			outNet.close();
-		}
-		System.out.println("Json==>" + json.toString());
-
+		responsebyJson(response_num, statues_code, outNet);
 		System.out
 				.println("----------------Register Complete!----------------");
 
 	}
 
-	/**
-	 * 处理文件上传
-	 * 
-	 * @param item
-	 * @param customer_id
-	 * @param uploadpath
-	 *            文件上传的目录
-	 * @return 0成功 1上传非wav文件
-	 */
-	private File processUploadedFile(FileItem item, String user_id,
-			String uploadpath, String filetype) {
-
-		String filename = item.getName();
-
-		try {
-			long fileSize = item.getSize();
-
-			if (filename.equals("") && fileSize == 0) {
-				System.out.println("File upload failed!");
-				return null;
-			}
-
-			String[] split = filename.split("\\.");
-			String filetype1 = split[split.length - 1];
-			if (!filetype1.equals("pcm")) {
-				System.out.println("Not a PCM file!");
-				return null;
-			}
-
-			PublicUtils.mkDir(uploadpath);
-			File uploadedFile = new File(uploadpath, PublicUtils.getFileName(
-					"register", user_id, filetype));
-			item.write(uploadedFile);
-			return uploadedFile;
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-
-	}
+	
 
 }

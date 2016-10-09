@@ -14,6 +14,8 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
 
+import org.apache.commons.fileupload.FileItem;
+
 public class PublicUtils {
 
 	public static void deletefile(String filepath) {
@@ -294,4 +296,49 @@ public class PublicUtils {
 			return true;
 		}
 	}
+
+	/**
+	 * 
+	 * @param item
+	 * @param filename
+	 *            用户文件名
+	 * @param uploadpath
+	 *            文件存放路径
+	 * @param filetype
+	 *            文件类型
+	 * @return 上传文件的File对象
+	 */
+	public static File processUploadedFile(FileItem item, String filename,
+			String uploadpath, String filetype) {
+
+		try {
+			long fileSize = item.getSize();
+
+			if (filename.equals("") && fileSize == 0) {
+				System.out.println("File upload failed!");
+				return null;
+			}
+
+			String[] split = filename.split("\\.");
+			String filetype1 = split[split.length - 1];
+			if (!filetype1.equals(filetype)) {
+				System.out.println("Not a " + filetype + " file!");
+				return null;
+			}
+
+			PublicUtils.mkDir(uploadpath);
+
+			//
+			File uploadedFile = new File(uploadpath, filename);
+
+			item.write(uploadedFile);
+			return uploadedFile;
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+
+	}
+
 }

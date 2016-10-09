@@ -20,31 +20,18 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 import com.pingan.constant.Constant;
 import com.pingan.domain.PCMRequestBean;
+import com.pingan.factory.UploadFactory;
 import com.pingan.service.PCMSerivce;
 import com.pingan.service.impl.PCMSerivceImpl;
 import com.pingan.utils.FeatureUtils;
 import com.pingan.utils.PublicUtils;
 
-public class PCMValidationServlet extends HttpServlet {
+public class PCMValidationServlet extends BaseUploadServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	private File tempFile;
-	private PCMSerivce service;
-
-	@Override
-	public void init(ServletConfig config) throws ServletException {
-
-		super.init(config);
-		service = new PCMSerivceImpl();
-		tempFile = new File(Constant.TEMPPATH);
-		PublicUtils.mkDir(Constant.PCMTESTROOT);
-
-	}
-
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
 		doPost(request, response);
 	}
 
@@ -54,7 +41,6 @@ public class PCMValidationServlet extends HttpServlet {
 		System.out.println("----------------Validation...----------------");
 
 		int statues_code = 0;
-
 		PCMRequestBean pcb = null;
 		File testvoice = null;
 		String usertestpath = "";
@@ -71,14 +57,9 @@ public class PCMValidationServlet extends HttpServlet {
 
 		if (isMultipart) {
 
-			DiskFileItemFactory factory = new DiskFileItemFactory();
-			factory.setSizeThreshold(1024 * 1024); // 设置缓冲区大小为1M
-			factory.setRepository(tempFile); // 设置临时目录
+			ServletFileUpload upload = UploadFactory.getBaseUpLoad(tempFile,
+					20 * 1024 * 1024);
 
-			// 创建一个文件上传处理器
-			ServletFileUpload upload = new ServletFileUpload(factory);
-			upload.setHeaderEncoding("utf-8");
-			upload.setSizeMax(8 * 1024 * 1024); // 允许文件的最大上传尺寸8M
 			try {
 				List<FileItem> items = upload.parseRequest(request);
 				for (FileItem item : items) {
@@ -103,7 +84,7 @@ public class PCMValidationServlet extends HttpServlet {
 
 						} else {
 							pcb = service.Query(person_id);
-							//验证语音的nas_dir
+							// 验证语音的nas_dir
 							pcb.setNas_dir(nas_dir);
 						}
 
@@ -117,8 +98,15 @@ public class PCMValidationServlet extends HttpServlet {
 												Constant.PCMTESTROOT);
 
 								// 处理上传文件
-								testvoice = processUploadedFile(item,
-										pcb.getUser_id(), usertestpath, "pcm");
+								// testvoice = processUploadedFile(item,
+								// , usertestpath, "pcm");
+
+								// 处理文件上传
+								String filename = PublicUtils
+										.getFileNameWithUUID("test",
+												pcb.getUser_id(), "pcm");
+								testvoice = PublicUtils.processUploadedFile(
+										item, filename, usertestpath, "pcm");
 
 								if (testvoice == null) {
 									statues_code += 1;
@@ -152,8 +140,7 @@ public class PCMValidationServlet extends HttpServlet {
 								usertestpath,
 								PublicUtils.getFileName("test",
 										pcb.getPerson_id(), "feature"));
-				
-				
+
 				// 评分
 				double score = FeatureUtils.KaldiDotscore(
 						pcb.getIvector_path(), testivectorPath,
@@ -163,8 +150,8 @@ public class PCMValidationServlet extends HttpServlet {
 				} else {
 					result = 1;
 				}
-				service.update(pcb);//更新数据库  nas_dir
-				
+				service.update(pcb);// 更新数据库 nas_dir
+
 				System.out.println("score==>" + score);
 
 			} else {
@@ -172,84 +159,9 @@ public class PCMValidationServlet extends HttpServlet {
 			}
 		}
 
-		JSONObject jo = new JSONObject();
-		jo.put("response_num", response_num);
-		jo.put("statues_code", statues_code);
-		jo.put("result", result);
-		outNet.println(jo.toString());
-		outNet.close();
-
-		System.out.println("Json==>" + jo.toString());
-
+		responsebyJson(response_num, statues_code, result, outNet);
 		System.out
 				.println("----------------Validation Complete!----------------");
 	}
 
-	/**
-	 * 
-	 * @param item
-	 * @param user_id
-	 * @param uploadpath
-	 * @param filetype
-	 * @return
-	 */
-	private File processUploadedFile(FileItem item, String user_id,
-			String uploadpath, String filetype) {
-
-		String filename = item.getName();
-
-		try {
-			long fileSize = item.getSize();
-
-			if (filename.equals("") && fileSize == 0) {
-				System.out.println("File upload failed!");
-				return null;
-			}
-
-			String[] split = filename.split("\\.");
-			String filetype1 = split[split.length - 1];
-			if (!filetype1.equals("pcm")) {
-				System.out.println("Not a PCM file!");
-				return null;
-			}
-
-			PublicUtils.mkDir(uploadpath);
-			File uploadedFile = new File(uploadpath,
-					PublicUtils.getFileNameWithUUID("test", user_id, filetype));
-			item.write(uploadedFile);
-
-			return uploadedFile;
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
-
-	}
-
-	/**
-	 * 
-	 * @param register_ivecter_dir
-	 *            注册的特征文件的路径
-	 * @param test_ivector_dir
-	 *            验证的wav的文件路径
-	 * @return 评分
-	 */
-	public double KaldiTest(String register_ivecter_dir, String test_ivector_dir) {
-
-		double result = -999;
-
-		switch (Constant.SCORE_MODE) {
-		case PLDA:
-			result = FeatureUtils.KaldiPLDAscore(register_ivecter_dir,
-					test_ivector_dir, Constant.TOOLPATH);
-			break;
-
-		case DOT:
-			result = FeatureUtils.KaldiDotscore (register_ivecter_dir,
-					test_ivector_dir, Constant.TOOLPATH);
-			break;
-		}
-		return result;
-	}
 }

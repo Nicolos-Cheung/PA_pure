@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.pingan.constant.Constant;
+
 public class FeatureUtils {
 
 	/**
@@ -377,5 +379,31 @@ public class FeatureUtils {
 		}
 
 		return bf.toString();
+	}
+	
+	/**
+	 * 
+	 * @param register_ivecter_dir
+	 *            注册的特征文件的路径
+	 * @param test_ivector_dir
+	 *            验证的wav的文件路径
+	 * @return 评分
+	 */
+	public static double KaldiTest(String register_ivecter_dir, String test_ivector_dir) {
+
+		double result = -999;
+
+		switch (Constant.SCORE_MODE) {
+		case PLDA:
+			result = FeatureUtils.KaldiPLDAscore(register_ivecter_dir,
+					test_ivector_dir, Constant.TOOLPATH);
+			break;
+
+		case DOT:
+			result = FeatureUtils.KaldiDotscore (register_ivecter_dir,
+					test_ivector_dir, Constant.TOOLPATH);
+			break;
+		}
+		return result;
 	}
 }

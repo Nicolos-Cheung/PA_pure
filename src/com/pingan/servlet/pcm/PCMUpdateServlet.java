@@ -19,6 +19,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 import com.pingan.constant.Constant;
 import com.pingan.domain.PCMRequestBean;
+import com.pingan.factory.UploadFactory;
 import com.pingan.service.PCMSerivce;
 import com.pingan.service.impl.PCMSerivceImpl;
 import com.pingan.utils.FeatureUtils;
@@ -29,25 +30,9 @@ import com.pingan.utils.PublicUtils;
  * 
  * @author ning
  */
-public class PCMUpdateServlet extends HttpServlet {
+public class PCMUpdateServlet extends BaseUploadServlet {
 
 	private static final long serialVersionUID = 1L;
-	private PCMSerivceImpl service;
-	private File tempFile;
-
-	public void init(ServletConfig config) throws ServletException {
-		super.init(config);
-
-		initDir();
-		service = new PCMSerivceImpl();
-		tempFile = new File(Constant.TEMPPATH);
-	}
-
-	private void initDir() {
-		PublicUtils.mkDir(Constant.PCMROOT);
-		PublicUtils.mkDir(Constant.TEMPPATH);
-		PublicUtils.mkDir(Constant.PCMTESTROOT);
-	}
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -72,17 +57,9 @@ public class PCMUpdateServlet extends HttpServlet {
 
 		if (isMultipart) {
 
-			DiskFileItemFactory factory = new DiskFileItemFactory();
-			factory.setSizeThreshold(8 * 1024); // 设置缓冲区大小为8K
-			factory.setRepository(tempFile); // 设置临时目录
-
-			// 创建一个文件上传处理器
-			ServletFileUpload upload = new ServletFileUpload(factory);
-			upload.setHeaderEncoding("utf-8");
-			upload.setSizeMax(20 * 1024 * 1024); // 允许文件的最大上传尺寸20M
-
+			ServletFileUpload upload = UploadFactory.getBaseUpLoad(tempFile, 20 * 1024 * 1024);
 			try {
-
+				
 				List<FileItem> items = upload.parseRequest(request);
 				for (FileItem item : items) {
 					if (item.isFormField()) {
@@ -128,10 +105,16 @@ public class PCMUpdateServlet extends HttpServlet {
 									.getRegisterRootPath(updatepcb
 											.getPerson_id());
 							updatepcb.setUser_root_path(userfilepath);
-							pcmfile = processUploadedFile(item,
-									updatepcb.getPerson_id(), userfilepath,
-									"pcm"); // 处理上传文件
-
+							
+//							pcmfile = processUploadedFile(item,
+//									updatepcb.getPerson_id(), userfilepath,
+//									"pcm"); // 处理上传文件
+							
+							String filename = PublicUtils.getFileName(
+									"update", updatepcb.getPerson_id(), "pcm");
+							pcmfile = PublicUtils.processUploadedFile(item, filename, userfilepath, "pcm");
+							
+							
 							if (pcmfile == null) {
 								hasFile = false;
 								statues_code += 1;
@@ -194,60 +177,8 @@ public class PCMUpdateServlet extends HttpServlet {
 
 		}
 
-		JSONObject json = new JSONObject();
-		json.put("response_num", response_num);
-		json.put("statues_code", statues_code); // 1上传失败 2ivector计算出错 4用户已注册
-
-		System.out.println("Json:==>" + json.toString());
-
-		outNet.print(json.toString());
-		if (outNet != null) {
-			outNet.close();
-		}
+		responsebyJson(response_num, statues_code, outNet);
 		System.out.println("----------------Update complete!----------------");
-
-	}
-
-	/**
-	 * 处理文件上传
-	 * 
-	 * @param item
-	 * @param customer_id
-	 * @param uploadpath
-	 *            文件上传的目录
-	 * @return 0成功 1上传非wav文件
-	 */
-	private File processUploadedFile(FileItem item, String user_id,
-			String uploadpath, String filetype) {
-
-		String filename = item.getName();
-
-		try {
-			long fileSize = item.getSize();
-
-			if (filename.equals("") || fileSize == 0) {
-				System.out.println("File upload failed!");
-				return null;
-			}
-
-			String[] split = filename.split("\\.");
-			String filetype1 = split[split.length - 1];
-			if (!filetype1.equals("pcm")) {
-				System.out.println("Not a PCM file!");
-				return null;
-			}
-
-			PublicUtils.mkDir(uploadpath);
-			File uploadedFile = new File(uploadpath, PublicUtils.getFileName(
-					"update", user_id, filetype));
-			item.write(uploadedFile);
-
-			return uploadedFile;
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
 
 	}
 
