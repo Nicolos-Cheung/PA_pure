@@ -54,12 +54,8 @@ public class PCMSerivceImpl implements PCMSerivce {
 
 		PCMRequestBean pcb = dao.Query(updatepcb.getPerson_id());
 
-		if (null == pcb.getAvailable() || "0".equals(pcb.getAvailable())) {
-			return false;
-		} else {
 			dao.update(updatepcb);
 			return true;
-		}
 
 	}
 
@@ -77,6 +73,7 @@ public class PCMSerivceImpl implements PCMSerivce {
 	@Override
 	public boolean IsUserExist(String person_id) {
 
+		
 		PCMRequestBean pcb = dao.Query(person_id);
 		if (pcb.isExist()) {
 			return true;
@@ -90,6 +87,9 @@ public class PCMSerivceImpl implements PCMSerivce {
 	@Override
 	public boolean isAvailable(String person_id) {
 
+		if(person_id == null || "".equals(person_id)){
+			return false;
+		}
 		PCMRequestBean query = dao.Query(person_id);
 		
 		if (query != null && query.getAvailable() != null
@@ -107,12 +107,17 @@ public class PCMSerivceImpl implements PCMSerivce {
 	@Override
 	public String getRegisterRootPath(String person_id) {
 
+		if(person_id == null || "".equals(person_id)){
+			return "error:path not find";
+		}
 		String user_root_path = dao.Query(person_id).getUser_root_path();
 		return user_root_path;
 	}
 
 	@Override
 	public void remove(String person_id) {
+		
+		
 		dao.remove(person_id);
 	}
 

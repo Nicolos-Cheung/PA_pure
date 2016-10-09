@@ -3,50 +3,44 @@ package com.pingan.constant;
 public interface Constant {
 	
 	
-//	/**
-//	 * WorkServerPath
-//	 */
-//	/**
-//	 * 工具路径
-//	 */
-//	public static final String TOOLPATH = "/wls/padl_spk/javaweb/tool";
-//	
-//	/**
-//	 * pcm工具路径
-//	 */
-//	public static final String PCMTOOLPATH = "/wls/padl_spk/javaweb/pcmtool";
-//
-//	/**
-//	 * 数据文件根目录
-//	 */
-//	public static final String FILEPATH = "/wls/padl_spk/javaweb/server_data";
-	
-	
 	/**
-	 * TestServerPath   //测试服务器使用
+	 * WorkServerPath
 	 */
 	/**
 	 * 工具路径
 	 */
-	public static final String TOOLPATH = "/home/pingandl/javaserver/tool";
+	public static final String TOOLPATH = "/wls/padl_spk/javaweb/tool";
 	
 	/**
-	 * 工具路径
+	 * pcm工具路径
 	 */
-	public static final String PCMTOOLPATH = "/home/pingandl/javaserver/pcmtool";
+	public static final String PCMTOOLPATH = "/wls/padl_spk/javaweb/pcmtool";
 
 	/**
 	 * 数据文件根目录
 	 */
-	public static final String FILEPATH = "/home/pingandl/javaserver/server_data";
+	public static final String FILEPATH = "/wls/padl_spk/javaweb/server_data";
+	
+
+//	/**
+//	 * TestServerPath   //测试服务器使用
+//	 */
+//	/**
+//	 * 工具路径
+//	 */
+//	public static final String TOOLPATH = "/home/pingandl/javaserver/tool";
+//	
+//	/**
+//	 * 工具路径
+//	 */
+//	public static final String PCMTOOLPATH = "/home/pingandl/javaserver/pcmtool";
+//
+//	/**
+//	 * 数据文件根目录
+//	 */
+//	public static final String FILEPATH = "/home/pingandl/javaserver/server_data";
 	
 //----------------------------------------------------------------------------------------------------
-	
-	
-	
-	
-	
-	
 	/**
 	 * PCM上传注册语音文件,和ivector的根目录
 	 */
@@ -88,12 +82,16 @@ public interface Constant {
 	/**
 	 * PLDA阈值
 	 */
-	public static final float PLDA_THRESHOLD = (float) 1.75;
+	public static final float PLDA_THRESHOLD = (float)1.75;
+	/**
+	 * DOT阈值
+	 */
+	public static final float DOT_THRESHOLD = (float)200;
 
 	/**
 	 * 评分方式
 	 */
-	public static final SCORE SCORE_MODE = SCORE.PLDA;
+	public static final SCORE SCORE_MODE = SCORE.DOT;
 
 	public enum SCORE {
 		DOT, PLDA

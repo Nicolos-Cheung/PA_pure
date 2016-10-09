@@ -67,6 +67,7 @@ public class PCMValidationServlet extends HttpServlet {
 
 		String person_id = null;
 		String response_num = null;
+		String nas_dir = null;
 
 		if (isMultipart) {
 
@@ -91,6 +92,10 @@ public class PCMValidationServlet extends HttpServlet {
 						if (name.equals("response_num")) {
 							response_num = item.getString();
 						}
+						if (name.equals("nas_dir")) {
+							nas_dir = item.getString();
+						}
+
 					} else {
 						System.out.println("Validation_person_id=" + person_id);
 
@@ -98,6 +103,8 @@ public class PCMValidationServlet extends HttpServlet {
 
 						} else {
 							pcb = service.Query(person_id);
+							//验证语音的nas_dir
+							pcb.setNas_dir(nas_dir);
 						}
 
 						if (pcb != null && pcb.isAbleToVali()) {
@@ -145,16 +152,19 @@ public class PCMValidationServlet extends HttpServlet {
 								usertestpath,
 								PublicUtils.getFileName("test",
 										pcb.getPerson_id(), "feature"));
-
+				
+				
 				// 评分
-				double score = FeatureUtils.KaldiPLDAscore2(
+				double score = FeatureUtils.KaldiDotscore(
 						pcb.getIvector_path(), testivectorPath,
 						Constant.PCMTOOLPATH);
-				if (score > Constant.PLDA_THRESHOLD) {
+				if (score > Constant.DOT_THRESHOLD) {
 					result = 0;
 				} else {
 					result = 1;
 				}
+				service.update(pcb);//更新数据库  nas_dir
+				
 				System.out.println("score==>" + score);
 
 			} else {
@@ -236,11 +246,10 @@ public class PCMValidationServlet extends HttpServlet {
 			break;
 
 		case DOT:
-			result = FeatureUtils.Kaldiscore(register_ivecter_dir,
+			result = FeatureUtils.KaldiDotscore (register_ivecter_dir,
 					test_ivector_dir, Constant.TOOLPATH);
 			break;
 		}
-		System.out.println("result=" + result);
 		return result;
 	}
 }

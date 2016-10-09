@@ -148,9 +148,11 @@ public class PCMRequestBean {
 		if (null == source || "".equals(source)) {
 			return false;
 		}
+
 		if (null == register_voice_path || "".equals(register_voice_path)) {
 			return false;
 		}
+
 		if (null == user_root_path || "".equals(user_root_path)) {
 			return false;
 		}
@@ -179,15 +181,18 @@ public class PCMRequestBean {
 	public boolean isAbleToVali() {
 
 		if (null == person_id || "".equals(person_id)) {
-
 			return false;
 		}
 		if (null == ivector_path || "".equals(ivector_path)) {
 			return false;
 		}
-		if (null == available || "".equals(available)) {
+		if (null == available || "".equals(available) || "0".equals(available)) {
 			return false;
 		}
+		if (null == nas_dir || "".equals(nas_dir)) {
+			return false;
+		}
+
 		return true;
 	}
 

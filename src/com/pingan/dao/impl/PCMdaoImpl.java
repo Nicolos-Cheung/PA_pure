@@ -40,7 +40,7 @@ public class PCMdaoImpl implements PCMdao {
 			dbObject.put("ivector_path", pcb.getIvector_path());
 			dbObject.put("available", pcb.getAvailable());
 			dbObject.put("user_root_path", pcb.getUser_root_path());
-			WriteResult insert = collection.insert(dbObject);
+			 collection.insert(dbObject);
 			return true;
 
 		} catch (UnknownHostException e) {

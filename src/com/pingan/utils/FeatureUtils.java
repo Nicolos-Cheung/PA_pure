@@ -87,7 +87,7 @@ public class FeatureUtils {
 	 * @param toolpath
 	 * @return
 	 */
-	public static double Kaldiscore(String registerdir, String testdir,
+	public static double KaldiDotscore(String registerdir, String testdir,
 			String toolpath) {
 		Process process = null;
 		List<String> processList = new ArrayList<String>();
@@ -152,7 +152,7 @@ public class FeatureUtils {
 	}
 
 	/**
-	 * 
+	 * PLDA3评分方式
 	 * @param registerdir
 	 *            注册特征值文件路径
 	 * @param testdir

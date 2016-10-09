@@ -79,7 +79,7 @@ public class PCMUpdateServlet extends HttpServlet {
 			// 创建一个文件上传处理器
 			ServletFileUpload upload = new ServletFileUpload(factory);
 			upload.setHeaderEncoding("utf-8");
-			upload.setSizeMax(10 * 1024 * 1024); // 允许文件的最大上传尺寸10M
+			upload.setSizeMax(20 * 1024 * 1024); // 允许文件的最大上传尺寸20M
 
 			try {
 
@@ -103,9 +103,6 @@ public class PCMUpdateServlet extends HttpServlet {
 						}
 						if (name.equals("policy_number")) {
 							updatepcb.setPolicy_number(item.getString());
-						}
-						if (name.equals("nas_dir")) {
-							updatepcb.setNas_dir(item.getString());
 						}
 						if (name.equals("response_num")) {
 							response_num = item.getString();
@@ -176,13 +173,23 @@ public class PCMUpdateServlet extends HttpServlet {
 					updatepcb.setRegister_date(PublicUtils.getDetailData());
 
 					if (updatepcb.isAbleToRegister()) {
-						service.update(updatepcb);
-						System.out.println("UpdatePCB:==>" + updatepcb.toString());
+						boolean update = service.update(updatepcb);
+						System.out.println("UpdatePCB:==>"
+								+ updatepcb.toString());
+						if(!update){
+							statues_code += 16;
+						}
+						
 					} else {
 						statues_code += 8;
 					}
 
 				}
+			}
+
+		} else {
+			if (statues_code == 0) {
+				statues_code += 1;
 			}
 
 		}
@@ -191,14 +198,12 @@ public class PCMUpdateServlet extends HttpServlet {
 		json.put("response_num", response_num);
 		json.put("statues_code", statues_code); // 1上传失败 2ivector计算出错 4用户已注册
 
-		
 		System.out.println("Json:==>" + json.toString());
 
 		outNet.print(json.toString());
 		if (outNet != null) {
 			outNet.close();
 		}
-		
 		System.out.println("----------------Update complete!----------------");
 
 	}
@@ -234,7 +239,7 @@ public class PCMUpdateServlet extends HttpServlet {
 
 			PublicUtils.mkDir(uploadpath);
 			File uploadedFile = new File(uploadpath, PublicUtils.getFileName(
-					"update_register", user_id, filetype));
+					"update", user_id, filetype));
 			item.write(uploadedFile);
 
 			return uploadedFile;
