@@ -1,52 +1,42 @@
-package com.pingan.servlet.pcm;
+package com.pingan.servlet.async;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.concurrent.ThreadPoolExecutor;
 
-import javax.servlet.ServletConfig;
+import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.sf.json.JSONObject;
-
 import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
 import com.pingan.constant.Constant;
 import com.pingan.domain.PCMRequestBean;
 import com.pingan.factory.UploadFactory;
-import com.pingan.service.PCMSerivce;
-import com.pingan.service.impl.PCMSerivceImpl;
+import com.pingan.servlet.async.thread.AsyncRegisterProcessor;
+import com.pingan.servlet.listener.AppAsyncListener;
+import com.pingan.servlet.pcm.BaseUploadServlet;
 import com.pingan.utils.FeatureUtils;
 import com.pingan.utils.PublicUtils;
 
-/**
- * 处理register请求的servlet
- * 
- * @author ning
- */
-public class PCMRegisterServlet extends BaseUploadServlet {
-
-	private static final long serialVersionUID = 1L;
+public class AsyneReigsterServlet extends BaseUploadServlet {
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+
 		doPost(request, response);
 	}
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		
-		System.out.println("----------------Register...----------------");
-		
 
+		System.out.println("----------------Async Register...----------------");
+		request.setAttribute("org.apache.catalina.ASYNC_SUPPORTED", true);
 		response.setContentType("text/plain");
 		// 向客户端发送响应正文
 		PrintWriter outNet = response.getWriter();
@@ -68,7 +58,6 @@ public class PCMRegisterServlet extends BaseUploadServlet {
 
 				List<FileItem> items = upload.parseRequest(request);
 
-				
 				for (FileItem item : items) {
 					if (item.isFormField()) {
 
@@ -125,8 +114,8 @@ public class PCMRegisterServlet extends BaseUploadServlet {
 							String filename = PublicUtils.getFileName(
 									"register", pcb.getPerson_id(), "pcm");
 
-							File pcmfile = PublicUtils.processUploadedFile(item, filename,
-									userfilepath, "pcm"); // 处理上传文件
+							File pcmfile = PublicUtils.processUploadedFile(
+									item, filename, userfilepath, "pcm"); // 处理上传文件
 
 							if (pcmfile == null) {
 								statues_code += 1;
@@ -143,53 +132,30 @@ public class PCMRegisterServlet extends BaseUploadServlet {
 			}
 		}
 
-		// 进行注册
+		AsyncContext asyncCtx = null;
+		try {
+			// 进行异步注册
+			asyncCtx = request.startAsync();
+			asyncCtx.addListener(new AppAsyncListener());
+			ThreadPoolExecutor executor = (ThreadPoolExecutor) request
+					.getServletContext().getAttribute("executor");
+			AsyncRegisterProcessor asyncpro = new AsyncRegisterProcessor(
+					asyncCtx, pcb, userfilepath, isCancel, service,
+					statues_code, response_num);
+			executor.execute(asyncpro);
 
-		if (statues_code <= 0) {
-			List<String> ivectorList = FeatureUtils.KaldiToPcmIvecter(
-					pcb.getRegister_voice_path(), Constant.PCMTOOLPATH);
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
 
-			if (null == ivectorList || ivectorList.size() == 0) {
-				statues_code += 2; // ivector计算出错
-			} else if (statues_code == 0) {
-				String ivectorPath = FeatureUtils.ListToFile_Return_FilePath2(
-						ivectorList, userfilepath, PublicUtils.getFileName(
-								"register", pcb.getPerson_id(), "feature"));
-
-				pcb.setAvailable("1"); // 标志位
-				pcb.setIvector_path(ivectorPath);
-				pcb.setIvector_version(Constant.IVECTOR_VERSION);
-
-				pcb.toString();
-				if (pcb.isAbleToRegister()) {
-
-					if (isCancel) {
-						boolean update = service.update(pcb);
-						if (!update) {
-							statues_code += 16;
-						}
-
-					} else {
-						boolean register = service.register(pcb);
-						if (!register) {
-							statues_code += 16;
-						}
-					}
-
-					System.out.println("RegisterPCB:==>" + pcb.toString());
-				} else {
-					statues_code += 8;
-				}
-
+			if (asyncCtx != null) {
+				asyncCtx.complete();
 			}
-		}
 
-		responsebyJson(response_num, statues_code, outNet);
+		}
 		System.out
 				.println("----------------Register Complete!----------------");
 
 	}
-
-	
 
 }

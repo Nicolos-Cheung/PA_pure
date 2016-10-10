@@ -9,7 +9,7 @@
 	<servlet>
 		<servlet-name>PCMRegisterServlet</servlet-name>
 		<servlet-class>com.pingan.servlet.pcm.PCMRegisterServlet</servlet-class>
-		<async-supported>true</async-supported>
+
 	</servlet>
 	<servlet>
 		<servlet-name>PCMUpdateServlet</servlet-name>
@@ -18,7 +18,6 @@
 	<servlet>
 		<servlet-name>PCMValidationServlet</servlet-name>
 		<servlet-class>com.pingan.servlet.pcm.PCMValidationServlet</servlet-class>
-		<async-supported>true</async-supported>
 	</servlet>
 	<servlet>
 		<servlet-name>PCMDeleteServlet</servlet-name>
@@ -36,9 +35,22 @@
 		<servlet-name>TestServlet</servlet-name>
 		<servlet-class>com.pingan.servlet.pcm.TestServlet</servlet-class>
 	</servlet>
+	<servlet>
+		<servlet-name>AsyneReigsterServlet</servlet-name>
+		<servlet-class>com.pingan.servlet.async.AsyneReigsterServlet</servlet-class>
+		<async-supported>true</async-supported>
+	</servlet>
+	<servlet>
+		<servlet-name>AsyncTest</servlet-name>
+		<servlet-class>com.pingan.servlet.AsyncTest</servlet-class>
+		<async-supported>true</async-supported>
+	</servlet>
 
 
 
+	<listener>
+		<listener-class>com.pingan.servlet.listener.AppContextListener</listener-class>
+	</listener>
 
 
 
@@ -67,6 +79,14 @@
 	<servlet-mapping>
 		<servlet-name>TestServlet</servlet-name>
 		<url-pattern>/test</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>AsyneReigsterServlet</servlet-name>
+		<url-pattern>/register_async</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>AsyncTest</servlet-name>
+		<url-pattern>/asyncTest</url-pattern>
 	</servlet-mapping>
 	<welcome-file-list>
 		<welcome-file>index.jsp</welcome-file>

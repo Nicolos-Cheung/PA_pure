@@ -5,12 +5,12 @@
 <title>pcm</title>
 </head>
 <body>
-	<div align="center">
+	<div id=left style="float: left;">
 		<form name="uploadForm" method="POST" enctype="MULTIPART/FORM-DATA"
 			action="${pageContext.request.contextPath}/pcm_register">
 			<table>
 				<tr>
-					<td>声纹注册</td>
+					<td>声纹同步注册</td>
 				</tr>
 				<tr>
 					<td><div align="left">user_id</div>
@@ -70,7 +70,76 @@
 				</tr>
 			</table>
 		</form>
-
+	</div>
+	<div id="right" style="float: left;">
+		<form name="uploadForm" method="POST" enctype="MULTIPART/FORM-DATA"
+			action="${pageContext.request.contextPath}/register_async">
+			<table>
+				<tr>
+					<td>声纹异步注册</td>
+				</tr>
+				<tr>
+					<td><div align="left">user_id</div>
+					</td>
+					<td><input type="text" id="user_id" name="user_id" size="20"
+						value="123456" /></td>
+				</tr>
+				<tr>
+					<td><div align="left">person_id</div>
+					</td>
+					<td><input type="text" id="person_id" name="person_id"
+						size="20" value="123456" />
+					</td>
+				</tr>
+				<tr>
+					<td><div align="left">telnum</div>
+					</td>
+					<td><input type="text" id="telnum" name="telnum" size="20"
+						value="18896932171" /></td>
+				</tr>
+				<tr>
+					<td><div align="left">source</div>
+					</td>
+					<td><input type="text" id="source" name="source" size="20"
+						value="1" /></td>
+				</tr>
+				<tr>
+					<td><div align="left">policy_number</div>
+					</td>
+					<td><input type="text" id="policy_number" name="policy_number"
+						value="368028201028201" size="20" />
+					</td>
+				</tr>
+				<tr>
+					<td><div align="left">nas_dir</div>
+					</td>
+					<td><input type="text" id="nas_dir" name="nas_dir" size="20"
+						value="/Users/ning/xxx/xx" /></td>
+				</tr>
+				<tr>
+					<td><div align="left">response_num</div>
+					</td>
+					<td><input type="text" id="response_num" name="response_num"
+						value="090256789019876" size="20" />
+					</td>
+				</tr>
+				<tr>
+					<td><div align="left" size="20">音频文件:</div>
+					</td>
+					<td><input type="file" name="file" size="20" /></td>
+				</tr>
+				<tr>
+					<td><input type="submit" name="submit" value="register">
+					</td>
+					<td><input type="reset" name="reset" value="reset">
+					</td>
+				</tr>
+			</table>
+		</form>
+	</div>
+	<div style="clear: both"></div>
+	<hr />
+	<div style="float:left;">
 		<form name="uploadForm" method="POST" enctype="MULTIPART/FORM-DATA"
 			action="${pageContext.request.contextPath}/pcm_update">
 			<table>
@@ -135,7 +204,8 @@
 				</tr>
 			</table>
 		</form>
-
+	</div>
+	<div style="float:left;">
 		<form name="uploadForm" method="POST" enctype="MULTIPART/FORM-DATA"
 			action="${pageContext.request.contextPath}/pcm_validation">
 			<table>
@@ -176,7 +246,9 @@
 				</tr>
 			</table>
 		</form>
-
+	</div>
+	
+	<div style="float:left;">
 		<form name="uploadForm" method="get" enctype="text/plain"
 			action="${pageContext.request.contextPath}/pcm_query">
 			<table>
@@ -205,7 +277,8 @@
 				</tr>
 			</table>
 		</form>
-
+	</div>
+	<div>
 		<form name="uploadForm" method="get" enctype="text/plain"
 			action="${pageContext.request.contextPath}/pcm_delete">
 			<table>
@@ -234,5 +307,8 @@
 				</tr>
 			</table>
 		</form>
+		</div>
+	<div style="clear:both"></div>
+
 </body>
 </html>

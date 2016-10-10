@@ -28,7 +28,8 @@ public interface Constant {
 	/**
 	 * 工具路径
 	 */
-	public static final String TOOLPATH = "/home/pingandl/javaserver/tool";
+//	public static final String TOOLPATH = "/home/pingandl/javaserver/tool";
+	public static final String TOOLPATH = "/tool"; 
 	
 	/**
 	 * 工具路径
