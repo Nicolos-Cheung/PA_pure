@@ -36,8 +36,8 @@
 		<servlet-class>com.pingan.servlet.pcm.TestServlet</servlet-class>
 	</servlet>
 	<servlet>
-		<servlet-name>AsyneReigsterServlet</servlet-name>
-		<servlet-class>com.pingan.servlet.async.AsyneReigsterServlet</servlet-class>
+		<servlet-name>AsyncReigsterServlet</servlet-name>
+		<servlet-class>com.pingan.servlet.async.AsyncReigsterServlet</servlet-class>
 		<async-supported>true</async-supported>
 	</servlet>
 	<servlet>
@@ -45,6 +45,11 @@
 		<servlet-class>com.pingan.servlet.AsyncTest</servlet-class>
 		<async-supported>true</async-supported>
 	</servlet>
+  <servlet>
+    <servlet-name>AsyncValidationServlet</servlet-name>
+    <servlet-class>com.pingan.servlet.async.AsyncValidationServlet</servlet-class>
+  </servlet>
+
 
 
 
@@ -81,13 +86,17 @@
 		<url-pattern>/test</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
-		<servlet-name>AsyneReigsterServlet</servlet-name>
+		<servlet-name>AsyncReigsterServlet</servlet-name>
 		<url-pattern>/register_async</url-pattern>
 	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>AsyncTest</servlet-name>
 		<url-pattern>/asyncTest</url-pattern>
 	</servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>AsyncValidationServlet</servlet-name>
+    <url-pattern>/validation_async</url-pattern>
+  </servlet-mapping>
 	<welcome-file-list>
 		<welcome-file>index.jsp</welcome-file>
 	</welcome-file-list>

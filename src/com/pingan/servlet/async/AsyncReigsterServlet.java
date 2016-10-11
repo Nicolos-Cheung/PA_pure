@@ -24,7 +24,7 @@ import com.pingan.servlet.pcm.BaseUploadServlet;
 import com.pingan.utils.FeatureUtils;
 import com.pingan.utils.PublicUtils;
 
-public class AsyneReigsterServlet extends BaseUploadServlet {
+public class AsyncReigsterServlet extends BaseUploadServlet {
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -50,7 +50,6 @@ public class AsyneReigsterServlet extends BaseUploadServlet {
 		boolean isMultipart = ServletFileUpload.isMultipartContent(request);
 
 		if (isMultipart) {
-
 			ServletFileUpload upload = UploadFactory.getBaseUpLoad(tempFile,
 					20 * 1024 * 1024);
 
@@ -100,7 +99,7 @@ public class AsyneReigsterServlet extends BaseUploadServlet {
 
 								isCancel = true;
 							} else {
-								// 根据userid 和根目录 得到用户的文件目录
+								// 根据 userid 和根目录 得到用户的文件目录
 								userfilepath = PublicUtils.getUserFilePath(
 										pcb.getPerson_id(), Constant.PCMROOT);
 							}
@@ -151,7 +150,6 @@ public class AsyneReigsterServlet extends BaseUploadServlet {
 			if (asyncCtx != null) {
 				asyncCtx.complete();
 			}
-
 		}
 		System.out
 				.println("----------------Register Complete!----------------");

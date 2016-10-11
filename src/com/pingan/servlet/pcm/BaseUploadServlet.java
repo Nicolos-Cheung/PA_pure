@@ -2,6 +2,7 @@ package com.pingan.servlet.pcm;
 
 import java.io.File;
 import java.io.PrintWriter;
+import java.text.DecimalFormat;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -39,7 +40,7 @@ public class BaseUploadServlet extends HttpServlet {
 		json.put("statues_code", statues_code); // 1上传失败 2ivector计算出错 4用户已注册
 
 		outNet.write(json.toString());
-//		outNet.print(json.toString());
+		// outNet.print(json.toString());
 		if (outNet != null) {
 			outNet.close();
 		}
@@ -48,10 +49,14 @@ public class BaseUploadServlet extends HttpServlet {
 	}
 
 	public void responsebyJson(String response_num, int statues_code,
-			int result, PrintWriter outNet) {
+			double result, PrintWriter outNet) {
 
+		System.out.println(result);
+		DecimalFormat df = new DecimalFormat("####0.00");
+		String resultformat = df.format(result);
 		JSONObject json = new JSONObject();
 		json.put("response_num", response_num);
+		json.put("result", resultformat);
 		json.put("statues_code", statues_code);
 
 		outNet.print(json.toString());

@@ -43,9 +43,8 @@ public class PCMRegisterServlet extends BaseUploadServlet {
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		
+
 		System.out.println("----------------Register...----------------");
-		
 
 		response.setContentType("text/plain");
 		// 向客户端发送响应正文
@@ -68,7 +67,6 @@ public class PCMRegisterServlet extends BaseUploadServlet {
 
 				List<FileItem> items = upload.parseRequest(request);
 
-				
 				for (FileItem item : items) {
 					if (item.isFormField()) {
 
@@ -98,14 +96,15 @@ public class PCMRegisterServlet extends BaseUploadServlet {
 					} else {
 
 						if (pcb.getPerson_id() == null
-								|| "".equals(pcb.getPerson_id())
-								|| service.IsUserExist(pcb.getPerson_id())) {
+								|| "".equals(pcb.getPerson_id())) {
+							statues_code += 8;  //person_id为空
+
+						} else if (service.IsUserExist(pcb.getPerson_id())) {
+							//用户存在
 							statues_code += 4;
 						} else {
-
 							PCMRequestBean oldpcb = service.Query(pcb
 									.getPerson_id());
-
 							if (oldpcb != null && oldpcb.getAvailable() != null) {
 								userfilepath = oldpcb.getUser_root_path();
 
@@ -120,13 +119,11 @@ public class PCMRegisterServlet extends BaseUploadServlet {
 
 							pcb.setUser_root_path(userfilepath);
 
-							PublicUtils.mkDir(userfilepath);
-
 							String filename = PublicUtils.getFileName(
 									"register", pcb.getPerson_id(), "pcm");
 
-							File pcmfile = PublicUtils.processUploadedFile(item, filename,
-									userfilepath, "pcm"); // 处理上传文件
+							File pcmfile = PublicUtils.processUploadedFile(
+									item, filename, userfilepath, "pcm"); // 处理上传文件
 
 							if (pcmfile == null) {
 								statues_code += 1;
@@ -189,7 +186,5 @@ public class PCMRegisterServlet extends BaseUploadServlet {
 				.println("----------------Register Complete!----------------");
 
 	}
-
-	
 
 }

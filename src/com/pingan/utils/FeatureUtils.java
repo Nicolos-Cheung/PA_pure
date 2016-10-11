@@ -396,12 +396,12 @@ public class FeatureUtils {
 		switch (Constant.SCORE_MODE) {
 		case PLDA:
 			result = FeatureUtils.KaldiPLDAscore(register_ivecter_dir,
-					test_ivector_dir, Constant.TOOLPATH);
+					test_ivector_dir, Constant.PCMTOOLPATH);
 			break;
 
 		case DOT:
 			result = FeatureUtils.KaldiDotscore (register_ivecter_dir,
-					test_ivector_dir, Constant.TOOLPATH);
+					test_ivector_dir, Constant.PCMTOOLPATH);
 			break;
 		}
 		return result;

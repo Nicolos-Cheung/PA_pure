@@ -23,19 +23,15 @@ public interface Constant {
 	
 
 	/**
-	 * TestServerPath   //测试服务器使用
+//	 * TestServerPath   //测试服务器使用
 	 */
 	/**
 	 * 工具路径
 	 */
-//	public static final String TOOLPATH = "/home/pingandl/javaserver/tool";
-	public static final String TOOLPATH = "/tool"; 
+	public static final String PCMTOOLPATH = "/tool";    //内存
+//	public static final String PCMTOOLPATH = "/home/pingandl/javaserver/pcmtool";
+//	public static final String PCMTOOLPATH = "/home/jiaqi/javaweb/tool";  //192.168.0.58
 	
-	/**
-	 * 工具路径
-	 */
-	public static final String PCMTOOLPATH = "/home/pingandl/javaserver/pcmtool";
-
 	/**
 	 * 数据文件根目录
 	 */

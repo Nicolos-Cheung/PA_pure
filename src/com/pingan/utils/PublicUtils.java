@@ -312,9 +312,12 @@ public class PublicUtils {
 			String uploadpath, String filetype) {
 
 		try {
+			System.out.println("file upload.............");
+			
 			long fileSize = item.getSize();
+			System.out.println("fileSize."+fileSize);
 
-			if (filename.equals("") && fileSize == 0) {
+			if (filename.equals("") || fileSize == 0) {
 				System.out.println("File upload failed!");
 				return null;
 			}
@@ -327,8 +330,6 @@ public class PublicUtils {
 			}
 
 			PublicUtils.mkDir(uploadpath);
-
-			//
 			File uploadedFile = new File(uploadpath, filename);
 
 			item.write(uploadedFile);

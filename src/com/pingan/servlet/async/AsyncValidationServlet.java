@@ -1,12 +1,14 @@
-package com.pingan.servlet.pcm;
+package com.pingan.servlet.async;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.text.DecimalFormat;
 import java.util.List;
+import java.util.concurrent.ThreadPoolExecutor;
 
+import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -16,15 +18,16 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import com.pingan.constant.Constant;
 import com.pingan.domain.PCMRequestBean;
 import com.pingan.factory.UploadFactory;
+import com.pingan.servlet.async.thread.AsyncValidationProcessor;
+import com.pingan.servlet.pcm.BaseUploadServlet;
 import com.pingan.utils.FeatureUtils;
 import com.pingan.utils.PublicUtils;
 
-public class PCMValidationServlet extends BaseUploadServlet {
-
-	private static final long serialVersionUID = 1L;
+public class AsyncValidationServlet extends BaseUploadServlet {
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+
 		doPost(request, response);
 	}
 
@@ -96,7 +99,7 @@ public class PCMValidationServlet extends BaseUploadServlet {
 
 								// 处理文件上传
 								String filename = PublicUtils
-										.getFileNameWithUUID("test",
+										.getFileName("test",
 												pcb.getUser_id(), "pcm");
 								testvoice = PublicUtils.processUploadedFile(
 										item, filename, usertestpath, "pcm");
@@ -117,48 +120,24 @@ public class PCMValidationServlet extends BaseUploadServlet {
 			}
 
 		}
+		AsyncContext asc = null;
+		try {
+			asc = request.getAsyncContext();
+			ThreadPoolExecutor executor = (ThreadPoolExecutor) request
+					.getServletContext().getAttribute("executor");
+			AsyncValidationProcessor validationProcessor = new AsyncValidationProcessor(
+					asc, statues_code, pcb, testvoice, usertestpath,
+					response_num);
+			executor.execute(validationProcessor);
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
 
-		double result = -1;
-
-		if (statues_code <= 0) {
-
-			List<String> featureList = FeatureUtils.KaldiToPcmIvecter(
-					testvoice.getAbsolutePath(), Constant.PCMTOOLPATH);
-
-			if (featureList != null && featureList.size() > 0) {
-
-				// 特征文件写入本地
-				String testivectorPath = FeatureUtils
-						.ListToFile_Return_FilePath2(
-								featureList,
-								usertestpath,
-								PublicUtils.getFileName("test",
-										pcb.getPerson_id(), "feature"));
-
-				// 评分
-				double score = FeatureUtils.KaldiDotscore(
-						pcb.getIvector_path(), testivectorPath,
-						Constant.PCMTOOLPATH);
-
-				if (score > Constant.DOT_THRESHOLD) {
-					// result = 0;
-					result = (((score - (double) Constant.DOT_THRESHOLD) / (400 - (double) Constant.DOT_THRESHOLD)) * 10);
-
-				} else {
-					// result = 1;
-					result = (((score - (double) Constant.DOT_THRESHOLD) / (double) Constant.DOT_THRESHOLD) * 10);
-				}
-				service.update(pcb);// 更新数据库 nas_dir
-
-				System.out.println("score==>" + score);
-
-			} else {
-				statues_code += 2;
+			if (asc != null) {
+				asc.complete();
 			}
 		}
-
-		
-		responsebyJson(response_num, statues_code, result, outNet);
 		System.out
 				.println("----------------Validation Complete!----------------");
 	}
